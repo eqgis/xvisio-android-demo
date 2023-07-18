@@ -42,6 +42,8 @@
 
 #define PI acos(-1)
 
+std::filebuf mapStream;
+
 enum Resolution {
     RGB_1920x1080 = 0,  ///< RGB 1080p
     RGB_1280x720 = 1,  ///< RGB 720p
@@ -149,6 +151,8 @@ static jmethodID s_rgbFpsCallback = nullptr;
 
 static jmethodID s_poseCallback = nullptr;
 static jmethodID s_poseCallbackEx = nullptr;
+
+static jmethodID s_saveMapDoneCallback = nullptr;
 
 static const xv::sgbm_config sgbm_config
         {
@@ -761,3 +765,76 @@ Java_org_xvisio_xvsdk_XCamera_stopCallbacks(JNIEnv *env, jclass type) {
     stopSgbmStream();
 }
 
+
+
+void cslamSavedCallback(int status_of_saved_map,int quality){
+    JNIEnv *jniEnv;
+    jvm->AttachCurrentThread(&jniEnv, NULL);
+    if (!s_XCameraClass || !jniEnv) {
+        return;
+    }
+    if (s_saveMapDoneCallback == nullptr) {
+        s_saveMapDoneCallback = jniEnv->GetStaticMethodID(s_XCameraClass, "cslamSavedCallback", "(II)V");
+    }
+    if (s_saveMapDoneCallback){
+        jniEnv->CallStaticVoidMethod(s_XCameraClass,s_saveMapDoneCallback,status_of_saved_map,quality);
+    }
+    mapStream.close();
+}
+
+void cslamSavedCallback2(int status_of_saved_map){
+    JNIEnv *jniEnv;
+    jvm->AttachCurrentThread(&jniEnv, NULL);
+    if (!s_XCameraClass || !jniEnv) {
+        return;
+    }
+    if (s_saveMapDoneCallback == nullptr) {
+        s_saveMapDoneCallback = jniEnv->GetStaticMethodID(s_XCameraClass, "cslamSavedCallback", "(II)V");
+    }
+    if (s_saveMapDoneCallback){
+        jniEnv->CallStaticVoidMethod(s_XCameraClass,s_saveMapDoneCallback,status_of_saved_map,-1);
+    }
+    mapStream.close();
+}
+
+void cslamLocalizedCallback(float percent)
+{
+    JNIEnv *jniEnv;
+    jvm->AttachCurrentThread(&jniEnv, NULL);
+    if (!s_XCameraClass || !jniEnv) {
+        return;
+    }
+    if (s_saveMapDoneCallback == nullptr) {
+        s_saveMapDoneCallback = jniEnv->GetStaticMethodID(s_XCameraClass, "cslamLocalizedCallback", "(F)V");
+    }
+    if (s_saveMapDoneCallback){
+        jniEnv->CallStaticVoidMethod(s_XCameraClass,s_saveMapDoneCallback,cslamLocalizedCallback,percent);
+    }
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_xvisio_xvsdk_XCamera_nSaveMapAndSwitchToCslam(JNIEnv *env, jclass clazz, jstring path) {
+    const char *filePath = env->GetStringUTFChars(path,0);
+    std::string filePathString = std::string (filePath);
+
+    if (mapStream.open(filePathString, std::ios::binary | std::ios::out | std::ios::trunc) == nullptr) {
+//        std::cout << "open " << filePathString << " failed." << std::endl;
+        return;
+    }
+    device->slam()->saveMapAndSwitchToCslam(mapStream, cslamSavedCallback, cslamLocalizedCallback);
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_xvisio_xvsdk_XCamera_nLoadMapAndSwitchToCslam(JNIEnv *env, jclass clazz, jstring path) {
+    const char *filePath = env->GetStringUTFChars(path,0);
+    std::string filePathString = std::string (filePath);
+
+    if (mapStream.open(filePathString, std::ios::binary | std::ios::out | std::ios::trunc) == nullptr) {
+        return;
+    }
+    device->slam()->loadMapAndSwitchToCslam(mapStream,cslamSavedCallback2, cslamLocalizedCallback)
+}

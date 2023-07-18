@@ -200,6 +200,22 @@ public class XCamera extends XVisioClass {
         mTofIrListener = listener;
     }
 
+    static CSlamListener mCSlamListener;
+    public synchronized void setCSlamListener(CSlamListener listener) {
+        mCSlamListener = listener;
+    }
+
+    public void saveMapAndSwitchToCslam(String s) {
+        nSaveMapAndSwitchToCslam(s);
+    }
+
+    public void loadMapAndSwitchToCslam(String s){
+        nLoadMapAndSwitchToCslam(s);
+    }
+
+    private static native void nLoadMapAndSwitchToCslam(String s);
+    private static native void nSaveMapAndSwitchToCslam(String s);
+
     private static native void nSetRgbSolution(int mode);
 
     private static native void nSetSlamMode(int mode);
@@ -278,6 +294,17 @@ public class XCamera extends XVisioClass {
     public static void tofIrCallback(int width, int height, int[] data) {
         if (mTofListener != null) {
             mTofIrListener.onTofIr(width, height, data);
+        }
+    }
+
+    public static void cslamSavedCallback(int status,int quality){
+        if (mCSlamListener != null){
+            mCSlamListener.doneCallback(status, quality);
+        }
+    }
+    public static void cslamLocalizedCallback(float percent){
+        if (mCSlamListener != null){
+            mCSlamListener.localizeOnReferenceMap(percent);
         }
     }
 

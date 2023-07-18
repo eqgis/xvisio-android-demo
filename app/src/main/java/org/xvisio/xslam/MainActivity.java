@@ -20,11 +20,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -60,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
     TextView mTvSolution, mTvFps;
     private StreamHandler mMainHandler;
 
+    private EditText outPutNameEditText;
+    private CheckBox checkBoxSlam;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
         mAppContext = getApplicationContext();
         mMainHandler = new StreamHandler(Looper.getMainLooper());
         setContentView(R.layout.activity_main);
+
+        outPutNameEditText = findViewById(R.id.save_map_edit_text);
 
         mBtRgbSolution = findViewById(R.id.button_rgb);
         mBtRgbSolution.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         modeSelect = radioSlam.getCheckedRadioButtonId();
         radioSlam.setOnCheckedChangeListener(mSlamModeListener);
 
-        CheckBox checkBoxSlam = findViewById(R.id.checkbox_slam);
+        checkBoxSlam = findViewById(R.id.checkbox_slam);
         checkBoxSlam.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -433,4 +440,22 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    public void execCSLAM(View view){
+        switch (view.getId()){
+            case R.id.startSlamBtn:
+                //单选框中调用了XCamera的startSLAM，此处就不在额外去写jni接口了
+                checkBoxSlam.setChecked(true);
+                break;
+            case R.id.stopSlamBtn:
+                checkBoxSlam.setChecked(false);
+                break;
+            case R.id.saveMapBtn:
+                //保存地图，在XCamera中去新增接口
+                Editable text = outPutNameEditText.getText();
+                String s = text.toString() + ".bin";
+                mCamera.saveMapAndSwitchToCslam(s);
+                break;
+        }
+    }
 }

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#aaa"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -19,6 +20,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <include
+                    android:layout_marginLeft="200dp"
+                    layout="@layout/accelerometer_display"
+                    android:id="@+id/accelerometerDisplay"
+                    android:orientation="vertical"
+                    android:layout_width="411dp"
+                    android:layout_height="75dp"/>
+            </RelativeLayout>
+
             <ImageView
                 android:id="@+id/logo"
                 android:layout_width="100dp"
@@ -27,8 +41,7 @@
                 app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginRight="10dp"
                 android:scaleType="centerInside"
-                app:srcCompat="@mipmap/logo" />
-
+                android:src="@drawable/holo_lg"/>
 
             <RadioGroup
                 android:id="@+id/radio_slam_mode"
@@ -56,7 +69,7 @@
                     android:text="EDGE+" />
             </RadioGroup>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <RelativeLayout
                 android:id="@+id/ll_checkbox"
                 android:orientation="horizontal"
                 android:layout_marginTop="5dp"
@@ -76,6 +89,7 @@
                     android:layout_height="wrap_content" />
 
                 <CheckBox
+                    android:layout_marginLeft="100dp"
                     android:id="@+id/checkbox_imu"
                     android:text="IMU"
                     android:checked="false"
@@ -83,20 +97,51 @@
                     app:layout_constraintLeft_toRightOf="@id/checkbox_slam"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </RelativeLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <include
-            layout="@layout/accelerometer_display"
-            android:id="@+id/accelerometerDisplay"
-            android:orientation="vertical"
-            android:layout_width="411dp"
-            android:layout_height="75dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></include>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <TextView
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:text="场景识别(CSLAM地图)："
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"/>
+            <EditText
+                android:paddingRight="10dp"
+                android:gravity="right"
+                android:text="map"
+                android:id="@+id/save_map_edit_text"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"/>
+            <!--按钮组-->
+            <Button
+                android:text="开启SLAM"
+                android:id="@+id/startSlamBtn"
+                android:onClick="execCSLAM"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"/>
+            <Button
+                android:text="停止SLAM"
+                android:id="@+id/stopSlamBtn"
+                android:onClick="execCSLAM"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"/>
+            <Button
+                android:text="保存地图"
+                android:id="@+id/saveMapBtn"
+                android:onClick="execCSLAM"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"/>
+
+        </LinearLayout>
 
         <include
             android:id="@+id/poseDisplay"
@@ -108,103 +153,127 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"></include>
 
-        <RadioGroup
-            android:id="@+id/radio_camera"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:ignore="Orientation">
+    <RadioGroup
+        android:id="@+id/radio_camera"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/radio_rgb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:checked="false"
-                android:text="RGB" />
-
-
-            <RadioButton
-                android:id="@+id/radio_tof"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:checked="false"
-                android:text="TOF" />
-
-            <RadioButton
-                android:id="@+id/radio_stereo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:checked="false"
-                android:text="STEREO" />
-
-            <RadioButton
-                android:id="@+id/radio_sgbm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:checked="false"
-                android:text="SGBM" />
-
-        </RadioGroup>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_rgb_stream"
-            android:layout_marginBottom="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radio_camera"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <Button
-                android:visibility="gone"
-                android:id="@+id/button_rgb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/tv_rgb_solution"
-                android:text="solution" />
-
-            <TextView
-                android:id="@+id/tv_rgb_solution"
-                android:text=""
-                android:textSize="14sp"
-                android:textColor="@android:color/holo_red_dark"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                android:layout_marginLeft="10dp" />
-
-            <TextView
-                android:id="@+id/tv_rgb_fps"
-                android:text=""
-                android:textSize="14sp"
-                android:textColor="@android:color/holo_red_dark"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/tv_rgb_solution"
-                app:layout_constraintRight_toRightOf="parent"
-                android:layout_marginRight="10dp" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <ImageView
-            android:id="@+id/rgbView"
+        <RadioButton
+            android:id="@+id/radio_rgb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            app:srcCompat="@color/colorAccent" />
+            android:checked="false"
+            android:text="RGB" />
+
+
+        <RadioButton
+            android:id="@+id/radio_tof"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:checked="false"
+            android:text="TOF" />
+
+        <RadioButton
+            android:id="@+id/radio_stereo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:checked="false"
+            android:text="STEREO" />
+
+        <RadioButton
+            android:id="@+id/radio_sgbm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:checked="false"
+            android:text="SGBM" />
+
+    </RadioGroup>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_rgb_stream"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radio_camera"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <Button
+            android:visibility="gone"
+            android:id="@+id/button_rgb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/tv_rgb_solution"
+            android:text="solution" />
+
+        <TextView
+            android:id="@+id/tv_rgb_solution"
+            android:text=""
+            android:textSize="14sp"
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginLeft="10dp" />
+
+        <TextView
+            android:id="@+id/tv_rgb_fps"
+            android:text=""
+            android:textSize="14sp"
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/tv_rgb_solution"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="10dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
+
+
+
+        <LinearLayout
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="108dp">
+
+            <ImageView
+                android:id="@+id/rgbView"
+                android:layout_width="192dp"
+                android:layout_height="108dp"
+                android:layout_gravity="center_horizontal"
+                app:srcCompat="@color/colorAccent" />
+
+            <ImageView
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="20dp"
+                android:layout_width="192dp"
+                android:layout_height="108dp"
+                android:layout_gravity="center_horizontal"
+                android:background="#ddd"/>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
