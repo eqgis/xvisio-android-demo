@@ -116,7 +116,7 @@
                 android:gravity="right"
                 android:text="map"
                 android:id="@+id/save_map_edit_text"
-                android:layout_width="200dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"/>
             <!--按钮组-->
             <Button
@@ -140,7 +140,20 @@
                 android:layout_centerInParent="true"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"/>
+            <Button
+                android:text="加载地图"
+                android:id="@+id/loadMapBtn"
+                android:onClick="execCSLAM"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"/>
 
+            <TextView
+                android:text="相似度: 0"
+                android:id="@+id/percent_text"
+                android:gravity="center_vertical"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"/>
         </LinearLayout>
 
         <include

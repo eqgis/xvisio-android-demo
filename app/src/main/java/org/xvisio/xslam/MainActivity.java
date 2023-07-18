@@ -1,5 +1,6 @@
 package org.xvisio.xslam;
 
+import org.xvisio.xvsdk.CSlamListener;
 import org.xvisio.xvsdk.SgbmListener;
 import org.xvisio.xvsdk.StreamData;
 import org.xvisio.xvsdk.TofIrListener;
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText outPutNameEditText;
     private CheckBox checkBoxSlam;
+    private String mapFilePath;
+    private TextView percentTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         outPutNameEditText = findViewById(R.id.save_map_edit_text);
+        percentTextView = findViewById(R.id.percent_text);
 
         mBtRgbSolution = findViewById(R.id.button_rgb);
         mBtRgbSolution.setOnClickListener(new View.OnClickListener() {
@@ -192,6 +196,8 @@ public class MainActivity extends AppCompatActivity {
             mCamera.setTofIrCallback(mTofIrListener);
             mCamera.setSgbmCallback(mSgbmListener);
             mCamera.setPoseCallback(mPoseListener);
+            //添加cslam监听事件
+            mCamera.setCSlamListener(mCSlamListener);
             mCamera.init(mAppContext);
         }
         mCamera.setRgbSolution(rgbSolution);
@@ -441,21 +447,42 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    public static final String DEFAULT_PATH = android.os.Environment.getExternalStorageDirectory().getAbsolutePath()
+            + "/Android/";
     public void execCSLAM(View view){
+        Editable text = outPutNameEditText.getText();
+        mapFilePath = DEFAULT_PATH + text.toString() + ".bin";
+        Log.i(TAG, "execCSLAM: File Path:"+mapFilePath);
         switch (view.getId()){
             case R.id.startSlamBtn:
-                //单选框中调用了XCamera的startSLAM，此处就不在额外去写jni接口了
-                checkBoxSlam.setChecked(true);
+//                checkBoxSlam.setChecked(true);
+                mCamera.startSlam();
                 break;
             case R.id.stopSlamBtn:
                 checkBoxSlam.setChecked(false);
                 break;
             case R.id.saveMapBtn:
                 //保存地图，在XCamera中去新增接口
-                Editable text = outPutNameEditText.getText();
-                String s = text.toString() + ".bin";
-                mCamera.saveMapAndSwitchToCslam(s);
+                mCamera.saveMapAndSwitchToCslam(mapFilePath);
+                break;
+            case R.id.loadMapBtn:
+                mCamera.loadMapAndSwitchToCslam(mapFilePath);
                 break;
         }
     }
+
+
+    private final CSlamListener mCSlamListener = new CSlamListener() {
+        @Override
+        public void doneCallback(int status, int quality) {
+            Log.i(TAG, "CSLAM-doneCallback: status:"+ status +", quality:" + quality);
+            Toast.makeText(mAppContext, "操作成功！\n路径: "+mapFilePath, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void localizeOnReferenceMap(float percent) {
+            Log.i(TAG, "CSLAM-localizeOnReferenceMap: percent:" + percent);
+            percentTextView.setText("相似度:" + String.format("%.4f",percent));
+        }
+    };
 }

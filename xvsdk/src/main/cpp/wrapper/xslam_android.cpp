@@ -836,5 +836,5 @@ Java_org_xvisio_xvsdk_XCamera_nLoadMapAndSwitchToCslam(JNIEnv *env, jclass clazz
     if (mapStream.open(filePathString, std::ios::binary | std::ios::out | std::ios::trunc) == nullptr) {
         return;
     }
-    device->slam()->loadMapAndSwitchToCslam(mapStream,cslamSavedCallback2, cslamLocalizedCallback)
+    device->slam()->loadMapAndSwitchToCslam(mapStream,cslamSavedCallback2, cslamLocalizedCallback);
 }

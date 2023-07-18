@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">XV 场景扫描</string>
+    <string name="mapScanPercent">{}</string>
 </resources>

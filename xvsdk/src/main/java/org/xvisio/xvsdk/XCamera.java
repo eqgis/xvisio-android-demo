@@ -213,6 +213,14 @@ public class XCamera extends XVisioClass {
         nLoadMapAndSwitchToCslam(s);
     }
 
+    public void startSlam() {
+        startSlamStream();
+    }
+
+    public void stopSlam(){
+        stopSlamStream();
+    }
+
     private static native void nLoadMapAndSwitchToCslam(String s);
     private static native void nSaveMapAndSwitchToCslam(String s);
 
